@@ -48,12 +48,6 @@ Add more songs to the list. Make energy matching stronger. Let users give feedba
 
 ## 9. Personal Reflection  
 
-A few sentences about your experience.  
-
-Prompts:  
-
-- What you learned about recommender systems  
-- Something unexpected or interesting you discovered  
-- How this changed the way you think about music recommendation apps  
+I was surprised how tweaking the weights could totally flip the recommendations, like making energy way more important than genre. Building this made me think about just how much more complicated the algorithms for real music apps are as well as the biases that come with it. I will definetly keep this project in mind the next time I get irritated when spotify recommends me a song that does not fit my taste at all. Even with all the smarts, human judgment still rules for catching those weird mismatches or understanding why a song just clicks for someone.
 
   
