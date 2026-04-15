@@ -1,66 +1,6 @@
 # 🎵 Music Recommender Simulation
 
-![alt text](image.png)
-![alt text](image-1.png)
-
-# proposed user profile:
-favorite_genre
-favorite_mood
-preffered_tempo
-preferred_acousticness
-preferred_valence
-target_energy = audio energy level
-preferred_intensity = subjective “edge” or aggression of the track
-
-Example point scheme
-genre_score: 0–1
-mood_score: 0–1
-tempo_score: 0–1
-acousticness_score: 0–1
-valence_score: 0–1
-energy_score: 0–1
-intensity_score: 0–1
-
-score =
-
-0.28 * genre_score
-+ 0.24 * mood_score
-+ 0.14 * tempo_score
-+ 0.12 * acousticness_score
-+ 0.12 * valence_score
-+ 0.06 * energy_score
-+ 0.04 * intensity_score
-
-How to compute similarity
-Genre: exact match = 1.0, related genre family = 0.6, otherwise 0.0
-Mood: exact or very close emotion = 1.0, similar mood = 0.5
-Tempo/attributes: use distance from preferred value, normalized to 0..1
-e.g. tempo_score = 1 - (abs(song_tempo - preferred_tempo) / max_tempo_diff)
-
-biases:
-
-Genre bias
-Heavily weighting favorite_genre favors familiar labels and can repeatedly recommend the same genre.
-It may underserve niche or cross-genre tracks that match mood/energy but not genre.
-
-Personalization vs. novelty bias
-Strong genre/mood weights can reduce exposure to new or surprising tracks.
-The algorithm may overfit to an assumed profile and fail to recommend useful variety.
-
-Cold-start bias
-New songs with incomplete metadata or missing feature values get penalized even if they would be good matches.
-New users with sparse preferences may get poor recommendations if the algorithm depends too much on exact matches.
-
-Mood label bias
-Mood is often subjective and inconsistently tagged.
-If mood categories are coarse or culturally biased, recommendations may reflect those labeling assumptions rather than actual user feeling.
-
-Audio feature matching bias
-Features like tempo, acousticness, valence, energy, and intensity assume the user wants exact audio similarity.
-This can overly favor tracks that sound “the same” and reduce diversity.
-
 ## Project Summary
-
 
 In this project you will build and explain a small music recommender system.
 
@@ -77,17 +17,42 @@ Replace this paragraph with your own summary of what your version does.
 
 ## How The System Works
 
-Explain your design in plain language.
+Algorithm recipe:
 
-Some prompts to answer:
+favorite_genre
+favorite_mood
+preffered_tempo
+preferred_acousticness
+preferred_valence
+target_energy = audio energy level
+preferred_intensity = subjective “edge” or aggression of the track
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+score =
+0.28 * genre_score
++ 0.24 * mood_score
++ 0.14 * tempo_score
++ 0.12 * acousticness_score
++ 0.12 * valence_score
++ 0.06 * energy_score
++ 0.04 * intensity_score
 
-You can include a simple diagram or bullet list if helpful.
+How to compute similarity
+Genre: exact match = 1.0, related genre family = 0.6, otherwise 0.0
+Mood: exact or very close emotion = 1.0, similar mood = 0.5
+Tempo/attributes: use distance from preferred value, normalized to 0..1
+e.g. tempo_score = 1 - (abs(song_tempo - preferred_tempo) / max_tempo_diff)
+
+Biases:
+
+Genre bias: Putting too much weight on your favorite genre means you keep getting the same old stuff. It might skip cool tracks that fit your mood or energy but come from different genres.
+
+Personalization vs. novelty bias: When genre and mood get all the attention, you miss out on fresh discoveries. The system sticks too closely to what it thinks you like and doesn't suggest anything new.
+
+Cold-start bias: New songs without full info get dinged, even if they'd be perfect. And new users with vague tastes get lousy recommendations because the system needs exact matches.
+
+Mood label bias: Mood tags are super subjective and often inconsistent. If the categories are broad or biased, the recommendations might not match how you actually feel.
+
+Audio feature matching bias: Matching exact audio traits like tempo assumes you want songs that sound identical. This leads to boring playlists that lack variety.
 
 ---
 
@@ -126,27 +91,35 @@ You can add more tests in `tests/test_recommender.py`.
 
 ---
 
+# Initally running main.py
+
+Top results match what I would expect for "pop/happy"
+
+![alt text](image.png)
+
 ## Experiments You Tried
 
-Use this section to document the experiments you ran. For example:
+Experiment: Weight Shift: Double the importance of energy and half the importance of genre.
 
-- What happened when you changed the weight on genre from 2.0 to 0.5
-- What happened when you added tempo or valence to the score
-- How did your system behave for different types of users
+The weight shift made the recommendations different rather than necessarily more accurate. By doubling energy importance and halving genre importance:
+
+High-energy profiles now prioritize songs with better energy matches over exact genre matches
+Low-energy profiles show less emphasis on genre, allowing mood and energy to play larger roles
+Conflicting preferences (like high energy + sad mood) maintain similar rankings but with adjusted scores
+Extreme cases (like high energy + classical) now surface high-energy songs from other genres that were previously ranked low
+The changes are most noticeable in profiles where energy and genre preferences conflict, where energy now has more influence on ranking. Whether this is "more accurate" depends on the user's actual listening preferences - the experiment demonstrates how weighting affects recommendation relevance.
+
+![alt text](image-2.png)
+
+![alt text](image-3.png)
+
+![alt text](image-4.png)
 
 ---
 
 ## Limitations and Risks
 
-Summarize some limitations of your recommender.
-
-Examples:
-
-- It only works on a tiny catalog
-- It does not understand lyrics or language
-- It might over favor one genre or mood
-
-You will go deeper on this in your model card.
+Songs that match genre are well picked, however there is a limitation with the energy attribute.
 
 ---
 
@@ -156,10 +129,7 @@ Read and complete `model_card.md`:
 
 [**Model Card**](model_card.md)
 
-Write 1 to 2 paragraphs here about what you learned:
-
-- about how recommenders turn data into predictions
-- about where bias or unfairness could show up in systems like this
+Building a music recommender showed me how these systems take user preferences and song details, sort them through formulas to score matches, and spit out suggestions. Using different attributes from each song like genre, mood, and audio vibes helps in predicting what the user may like next. But the tricky part is the biases—stuff like over-relying on genres can trap you in the same loop, or mood tags being subjective might not capture how you really feel, leading to unfair misses on great songs.
 
 
 ---
@@ -181,91 +151,50 @@ Give your recommender a name, for example:
 
 ## 2. Intended Use
 
-- What is this system trying to do
-- Who is it for
+This recommender suggests songs that match what you like in music. It looks at your favorite genre, mood, and energy level to find good matches.  
+The system scores songs by how well they match your preferences. Genre and mood are the biggest factors. Then it checks tempo, how acoustic it is, and energy level. Songs that match closer get higher scores. 
 
-Example:
-
-> This model suggests 3 to 5 songs from a small catalog based on a user's preferred genre, mood, and energy level. It is for classroom exploration only, not for real users.
 
 ---
 
 ## 3. How It Works (Short Explanation)
 
-Describe your scoring logic in plain language.
-
-- What features of each song does it consider
-- What information about the user does it use
-- How does it turn those into a number
-
-Try to avoid code in this section, treat it like an explanation to a non programmer.
+It looks at each song's genre, mood, tempo, how acoustic or upbeat it is, energy level, and that edgy feel. For the user, it uses the top picks in genre, mood, and those same traits. Then it figures out how close each song matches your tastes—perfect matches get a high score, close ones get medium, and it adds them all up with some weights to pick the best fits.
 
 ---
 
 ## 4. Data
 
-Describe your dataset.
+The dataset has 30 songs. Each song has details like genre, mood, energy, tempo, and more. It covers pop, lofi, rock, and some others. But it might not have all music types out there.
 
-- How many songs are in `data/songs.csv`
-- Did you add or remove any songs
-- What kinds of genres or moods are represented
-- Whose taste does this data mostly reflect
 
 ---
 
 ## 5. Strengths
 
-Where does your recommender work well
-
-You can think about:
-- Situations where the top results "felt right"
-- Particular user profiles it served well
-- Simplicity or transparency benefits
+It nails it when the user's tastes are very clear, like the loving pop and happy vibes—the top picks just feel spot on. Works great for people with strong genre preferences, and it's super straightforward to see why a song got recommended. So if in the future I wanted to change up the recipe, it would be simple to do so. 
 
 ---
 
 ## 6. Limitations and Bias
 
-Where does your recommender struggle
-
-Some prompts:
-- Does it ignore some genres or moods
-- Does it treat all users as if they have the same taste shape
-- Is it biased toward high energy or one genre by default
-- How could this be unfair if used in a real product
+The system sometimes picks songs that match genre well but not energy. For example, it might suggest a high-energy rock song to someone who wants chill pop. This could miss people who care a lot about energy.  
 
 ---
 
 ## 7. Evaluation
 
-How did you check your system
-
-Examples:
-- You tried multiple user profiles and wrote down whether the results matched your expectations
-- You compared your simulation to what a real app like Spotify or YouTube tends to recommend
-- You wrote tests for your scoring logic
-
-You do not need a numeric metric, but if you used one, explain what it measures.
+I tested it with different user types like high-energy pop fans and chill lofi lovers. I looked at the top 5 songs for each and checked if they matched the genre and energy. Some surprises, like how one intense song kept showing up for happy preferences.  
 
 ---
 
 ## 8. Future Work
 
-If you had more time, how would you improve this recommender
-
-Examples:
-
-- Add support for multiple users and "group vibe" recommendations
-- Balance diversity of songs instead of always picking the closest match
-- Use more features, like tempo ranges or lyric themes
+Add more songs to the list. Make energy matching stronger. Let users give feedback to improve algorithm recipe. 
 
 ---
 
 ## 9. Personal Reflection
 
-A few sentences about what you learned:
-
-- What surprised you about how your system behaved
-- How did building this change how you think about real music recommenders
-- Where do you think human judgment still matters, even if the model seems "smart"
+I was surprised how tweaking the weights could totally flip the recommendations, like making energy way more important than genre. Building this made me think about just how much more complicated the algorithms for real music apps are as well as the biases that come with it. I will definetly keep this project in mind the next time I get irritated when spotify recommends me a song that does not fit my taste at all. Even with all the smarts, human judgment still rules for catching those weird mismatches or understanding why a song just clicks for someone.
 
