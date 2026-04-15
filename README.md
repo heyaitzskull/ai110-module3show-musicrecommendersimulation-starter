@@ -1,6 +1,66 @@
 # 🎵 Music Recommender Simulation
 
+![alt text](image.png)
+![alt text](image-1.png)
+
+# proposed user profile:
+favorite_genre
+favorite_mood
+preffered_tempo
+preferred_acousticness
+preferred_valence
+target_energy = audio energy level
+preferred_intensity = subjective “edge” or aggression of the track
+
+Example point scheme
+genre_score: 0–1
+mood_score: 0–1
+tempo_score: 0–1
+acousticness_score: 0–1
+valence_score: 0–1
+energy_score: 0–1
+intensity_score: 0–1
+
+score =
+
+0.28 * genre_score
++ 0.24 * mood_score
++ 0.14 * tempo_score
++ 0.12 * acousticness_score
++ 0.12 * valence_score
++ 0.06 * energy_score
++ 0.04 * intensity_score
+
+How to compute similarity
+Genre: exact match = 1.0, related genre family = 0.6, otherwise 0.0
+Mood: exact or very close emotion = 1.0, similar mood = 0.5
+Tempo/attributes: use distance from preferred value, normalized to 0..1
+e.g. tempo_score = 1 - (abs(song_tempo - preferred_tempo) / max_tempo_diff)
+
+biases:
+
+Genre bias
+Heavily weighting favorite_genre favors familiar labels and can repeatedly recommend the same genre.
+It may underserve niche or cross-genre tracks that match mood/energy but not genre.
+
+Personalization vs. novelty bias
+Strong genre/mood weights can reduce exposure to new or surprising tracks.
+The algorithm may overfit to an assumed profile and fail to recommend useful variety.
+
+Cold-start bias
+New songs with incomplete metadata or missing feature values get penalized even if they would be good matches.
+New users with sparse preferences may get poor recommendations if the algorithm depends too much on exact matches.
+
+Mood label bias
+Mood is often subjective and inconsistently tagged.
+If mood categories are coarse or culturally biased, recommendations may reflect those labeling assumptions rather than actual user feeling.
+
+Audio feature matching bias
+Features like tempo, acousticness, valence, energy, and intensity assume the user wants exact audio similarity.
+This can overly favor tracks that sound “the same” and reduce diversity.
+
 ## Project Summary
+
 
 In this project you will build and explain a small music recommender system.
 
